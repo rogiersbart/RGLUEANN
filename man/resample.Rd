@@ -1,0 +1,20 @@
+\name{resample}
+\alias{resample}
+\title{Sampling parameter vectors function}
+\usage{
+resample(x, n, ...)
+}
+\arguments{
+  \item{x}{vector to sample from}
+
+  \item{n}{number of samples to draw from x}
+
+  \item{...}{other arguments to pass to sample.int}
+}
+\value{
+results of training an ANN
+}
+\description{
+\code{nncalc} is a wrapper for the AMORE package functions
+}
+

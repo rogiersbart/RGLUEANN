@@ -1,0 +1,4 @@
+S3method(predict,glue.ann)
+export(glue.ann)
+import(AMORE)
+import(Hmisc)
