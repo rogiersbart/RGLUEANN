@@ -1,6 +1,6 @@
 #' ANN training function
 #' 
-#' \code{nncalc} is a wrapper for the AMORE package functions
+#' \code{train_ann} is a wrapper for the AMORE package functions
 #' 
 #' @param Ptrain
 #' @param Pval
@@ -13,7 +13,7 @@
 #' @param hidden.layer
 #' @param output.layer
 #' @return results of training an ANN
-nncalc <- function(Ptrain, Pval, targetTrain, targetVal, architecture, n, Stao=1
+train_ann <- function(Ptrain, Pval, targetTrain, targetVal, architecture, n, Stao=1
 , es=T, hidden.layer="sigmoid", output.layer="purelin")
 {
   neuralnetwork <- newff(n.neurons=architecture, learning.rate.global=1e-2,

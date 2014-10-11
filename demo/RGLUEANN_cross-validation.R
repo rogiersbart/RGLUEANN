@@ -5,7 +5,7 @@
     inputData <- na.omit(airquality)[,2:4]
     
   # Perform cross-validation
-    cross_validation <- glue.ann(inputData, outputData, cv=T, nCycles=1000, nSets=10)
+    cross_validation <- glue_ann(inputData, outputData, cv=T, nCycles=1000, nSets=10)
     
   # Visualisation
     plot(cross_validation$target, ylim=c(-100,200), xlab='Sample number', ylab='Ozone')
