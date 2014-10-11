@@ -1,6 +1,6 @@
 #' Train a GLUE-ANN model ensemble
 #' 
-#' \code{glue.ann} trains a GLUE-ANN model ensemble. A dataframe has to be provided with the independent variable(s), and a vector with the dependent variable. A list of parameters has to be set to define the a priori distributions of the stochastic parameters, and fixed values for the ones considered to be constant. Be sure to load the additional GLUE-ANN functions into R before trying the examples provided below.
+#' \code{glue_ann} trains a GLUE-ANN model ensemble. A dataframe has to be provided with the independent variable(s), and a vector with the dependent variable. A list of parameters has to be set to define the a priori distributions of the stochastic parameters, and fixed values for the ones considered to be constant.
 #' 
 #' @param inputData input data frame
 #' @param outputData output data frame
@@ -11,7 +11,7 @@
 #' @param ES logical; enable early stopping; default: TRUE
 #' @param randomESPart part of the data used for early stopping; default: 0.5
 #' @param nonEqualMeans force similar mean for the early stopping samples as for the training samples; default: TRUE
-#' @param maxMeanDiff maximum difference between early stopping and training observation means; defaults to 20% of the target data mean
+#' @param maxMeanDiff maximum difference between early stopping and training observation means; defaults to 20 percent of the target data mean
 #' @param nCycles maximum number of training cycles, provide a vector for stochastic treatment; default: 100
 #' @param HLrange amount of hidden layers, provide vector for stochastic treatment; default: c(1:1)
 #' @param HNrange amount of hidden nodes, provide vector for stochastic treatment; default: c(1:10)
@@ -22,10 +22,10 @@
 #' @param nStedinger number of random variates for weights based on Stedinger et al. (2008); default: 50
 #' @param weighting GLUE weighting procedure; options are 'MSE', 'MSEes' (for weights based on the early stopping subset performance), 'NSEff' and 'Stedinger'; default: 'Stedinger'
 #' @param cv logical; do leave-one-out cross-validation; default: FALSE
-#' @return Object of class glue.ann
+#' @return Object of class glue_ann
 #' @export
 #' @import AMORE Hmisc
-glue.ann <- function(inputData,outputData,orthogonal='Cor',variableNumber=
+glue_ann <- function(inputData,outputData,orthogonal='Cor',variableNumber=
 c(1:ncol(inputData)),dimRed=T,rescale.output=T,ES=T,randomESPart=0.5,
 nonEqualMeans=T,maxMeanDiff=mean(outputData)*0.2,nCycles=100,HLrange=c(1:1),
 HNrange=c(1:10),maxHNPerVar=Inf,hidden.layer='tansig',output.layer='sigmoid',
@@ -53,13 +53,13 @@ nSets=100,nStedinger=50,weighting='Stedinger',cv=F)
   parameters$nStedinger <- nStedinger
   parameters$weighting <- weighting
   parameters$cv <- cv        
-  glue.ann <- NULL
+  glue_ann <- NULL
   cvPredictions <- NULL
-  glue.ann$parameters <- parameters      
-  glue.ann$esNumber <- matrix(nrow=nrow(inputData), ncol=nSets)
+  glue_ann$parameters <- parameters      
+  glue_ann$esNumber <- matrix(nrow=nrow(inputData), ncol=nSets)
   
   ### Training loop ############################################################
-  cat('Starting cross-validation loop..\n')
+  if(cv) cat('Starting cross-validation loop..\n')
   for(crossValidationSampleNumber in 1:ifelse(cv,nrow(inputData),1))
   {
     if(cv)
@@ -74,23 +74,23 @@ nSets=100,nStedinger=50,weighting='Stedinger',cv=F)
     }
     names(inputDataModelling) <- c(1:ncol(inputDataModelling))
     if(cv) names(inputDataModellingCV) <- c(1:ncol(inputDataModellingCV))        
-    glue.ann$inputData <- inputDataModelling
-    glue.ann$outputData <- outputDataModelling
+    glue_ann$inputData <- inputDataModelling
+    glue_ann$outputData <- outputDataModelling
     P <- cbind(inputDataModelling)    
     if(orthogonal != 'No'){Ppca <- princomp(P, cor=ifelse(orthogonal=='Cor', T, F));P <- Ppca$scores}
     trans <- P
-    glue.ann$P <- P
+    glue_ann$P <- P
     for(i in 1:ncol(inputData)) trans[,i] <- (trans[,i]-mean(P[,i]))/sd(P[,i])           
-    if(rescale.output) outputDataModelling <- (outputDataModelling - (min(glue.ann$outputData)))/(((max(glue.ann$outputData))-(min(glue.ann$outputData))))
-    if(rescale.output & cv) outputDataModellingCV <- (outputDataModellingCV -(min(glue.ann$outputData)))/(((max(glue.ann$outputData))-(
-    min(glue.ann$outputData))))
+    if(rescale.output) outputDataModelling <- (outputDataModelling - (min(glue_ann$outputData)))/(((max(glue_ann$outputData))-(min(glue_ann$outputData))))
+    if(rescale.output & cv) outputDataModellingCV <- (outputDataModellingCV -(min(glue_ann$outputData)))/(((max(glue_ann$outputData))-(
+    min(glue_ann$outputData))))
     variableslist <- list();networks <- list(); esNumber <- NULL
     earlyStoppingMSE <- NULL; earlyStoppingCycle <- NULL; hn <- list()
     totalVar <- NULL; trainingMSE <- NULL
     cat('Starting training loop..\n')
     for(j in 1:nSets)
     {
-      if(cv) cat(paste('# Cross-validating sample',crossValidationSampleNumber,' '))
+      if(cv) cat(paste('# Cross-validating sample',crossValidationSampleNumber,'\n'))
       if(ES) cat('Selecting early stopping data..\n')
       esDataNumbers <- sample(1:nrow(inputDataModelling),round(nrow(inputDataModelling)*randomESPart,0))
       while(nonEqualMeans)
@@ -123,7 +123,7 @@ nSets=100,nStedinger=50,weighting='Stedinger',cv=F)
       Pval <- as.data.frame(trans[esDataNumbers,variables])
       targetTrain <- outputDataModelling[trainingDataNumbers]
       targetVal <- outputDataModelling[esDataNumbers]
-      networks[[j]] <- nncalc(Ptrain, Pval, targetTrain, targetVal,
+      networks[[j]] <- train_ann(Ptrain, Pval, targetTrain, targetVal,
       architecture=c(nvars,hiddenNodes,1), ncyc, Stao=10, es=ES, hidden.layer=
       hidden.layer, output.layer=output.layer)
       if(ES) esNumber[j] <- which.min(networks[[j]]$Merror[,2])
@@ -142,22 +142,22 @@ nSets=100,nStedinger=50,weighting='Stedinger',cv=F)
       if(!ES) cat(paste('# Training MSE: ',format(trainingMSE[j],scientific=T, digits=3),
       ', cycles: ',earlyStoppingCycle[j],'\n', sep=''))
     }
-    glue.ann$networks <- networks
-    glue.ann$variables <- variableslist
-    glue.ann$trainMSE <- trainingMSE
-    if(ES) glue.ann$esMSE <- earlyStoppingMSE
-    if(ES) glue.ann$totalMSE <- (1-randomESPart) * glue.ann$trainMSE +
-    randomESPart * glue.ann$esMSE
-    if(!ES) glue.ann$totalMSE <- glue.ann$trainMSE
-    glue.ann$totalVar <- totalVar
-    glue.ann$hn <- hn
-    if(orthogonal != 'No') glue.ann$pca <- Ppca
-    class(glue.ann) <- 'glue.ann'
+    glue_ann$networks <- networks
+    glue_ann$variables <- variableslist
+    glue_ann$trainMSE <- trainingMSE
+    if(ES) glue_ann$esMSE <- earlyStoppingMSE
+    if(ES) glue_ann$totalMSE <- (1-randomESPart) * glue_ann$trainMSE +
+    randomESPart * glue_ann$esMSE
+    if(!ES) glue_ann$totalMSE <- glue_ann$trainMSE
+    glue_ann$totalVar <- totalVar
+    glue_ann$hn <- hn
+    if(orthogonal != 'No') glue_ann$pca <- Ppca
+    class(glue_ann) <- 'glue_ann'
     
     ### Predict cross-validated sample #########################################
     if(cv)
     {
-      cvPrediction <- predict(glue.ann, inputDataModellingCV)
+      cvPrediction <- predict(glue_ann, inputDataModellingCV)
       cvPredictions$MSE[crossValidationSampleNumber] <- mean(
       (outputData[crossValidationSampleNumber] - cvPrediction$eMean)^2)
       cvPredictions$eMean[crossValidationSampleNumber] <- cvPrediction$eMean
@@ -170,5 +170,5 @@ nSets=100,nStedinger=50,weighting='Stedinger',cv=F)
       cvPredictions$target[crossValidationSampleNumber] <- outputData[crossValidationSampleNumber]
     }
   }
-  if(cv){return(cvPredictions)} else {return(glue.ann)}
+  if(cv){return(cvPredictions)} else {return(glue_ann)}
 }

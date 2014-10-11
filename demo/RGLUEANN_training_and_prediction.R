@@ -10,19 +10,19 @@
     outputData <- jitter(outputData, amount=mean(outputData)*0.2)  
     
   # Run GLUE-ANN functions   
-    glue.ann.ensemble <- glue.ann(inputData, outputData, nCycles=500)
-    training.results <- predict(glue.ann.ensemble,inputData)
+    glue_ann_ensemble <- glue_ann(inputData, outputData, nCycles=500)
+    training.results <- predict(glue_ann_ensemble,inputData)
     
   # Visualise results for training data
     plot(inputData$x, training.results$eMean, type='l', xlab='x', ylab=expression(y = x^2 + epsilon), ylim=c(-2000,13000))
-    lines(inputData$x, glue.ann.ensemble$outputData, lty=2, col='red')
+    lines(inputData$x, glue_ann_ensemble$outputData, lty=2, col='red')
     lines(inputData$x, training.results$eQ025, lty=3, col='blue')
     lines(inputData$x, training.results$eQ975, lty=3, col='blue')
     legend('topleft', c('GLUE-ANN ensemble mean prediction','Observations','95% prediction uncertainty'), lty=c(1,2,3),col=c('black','red','blue'),bty='n')
     
   # Predict new data
     newData <- data.frame(x=c(-100:200)+0.5)                                       
-    newData.predictions <- predict(glue.ann.ensemble, newData)
+    newData.predictions <- predict(glue_ann_ensemble, newData)
     
   # Visualise results of prediction
     plot(newData$x, newData.predictions$eMean, type='l', xlab='x', ylab=expression(y = x^2 + epsilon), ylim=c(-2000,13000))                                  

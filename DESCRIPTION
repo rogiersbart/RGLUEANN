@@ -2,7 +2,7 @@ Package: RGLUEANN
 Type: Package
 Title: Non-linear probabilistic data-driven modelling using general likelihood
     uncertainty estimation and artificial neural networks
-Version: 0.1.1
+Version: 0.2.0
 Date: 2014-06-14
 Author: Bart Rogiers <brogiers@sckcen.be>
 Maintainer: Bart Rogiers <brogiers@sckcen.be>
