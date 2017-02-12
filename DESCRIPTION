@@ -4,6 +4,7 @@ Title: Non-linear probabilistic data-driven modelling using general likelihood
     uncertainty estimation and artificial neural networks
 Version: 0.2.0
 Date: 2014-06-14
+Authors@R: person("Bart", "Rogiers", role = c("aut", "cre"), email = "brogiers@sckcen.be")
 Author: Bart Rogiers <brogiers@sckcen.be>
 Maintainer: Bart Rogiers <brogiers@sckcen.be>
 Description: The RGLUEANN package provides basic functionality for training a
@@ -14,3 +15,4 @@ Imports:
     AMORE,
     Hmisc
 URL: https://github.com/rogiersbart/RGLUEANN
+BugReports: https://github.com/rogiersbart/RGLUEANN/issues
